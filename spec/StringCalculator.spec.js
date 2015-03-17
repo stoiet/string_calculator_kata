@@ -6,7 +6,7 @@ describe("StringCalculator", function () {
     describe("#Add", function () {
         
         beforeEach(function () {
-            this.stringCalculator = new StringCalculator(",");
+            this.stringCalculator = new StringCalculator();
         });
         
         it("should return 0 with empty string given", function () {
