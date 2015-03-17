@@ -1,0 +1,23 @@
+{
+  "name": "StringCalculatorKata",
+  "version": "1.0.0",
+  "description": "",
+  "main": "StringCalculator.js",
+  "scripts": {
+    "test": "mocha spec/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stoiet/string_calculator_kata.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stoiet/string_calculator_kata/issues"
+  },
+  "homepage": "https://github.com/stoiet/string_calculator_kata",
+  "devDependencies": {
+    "chai": "^2.1.2",
+    "mocha": "^2.2.1"
+  }
+}
