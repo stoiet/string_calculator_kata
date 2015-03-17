@@ -8,9 +8,9 @@ var StringConverter = (function () {
     
     InnerStringConverter.prototype = {
         convertToNumberArray: function (string) {
-            return string.split(this.delimiter)
-            .map(function (stringNumber) {
-                return parseInt(stringNumber);
+            return string.split(this.delimiter).
+            map(function (stringNumber) {
+                return parseInt(stringNumber.trim());
             });
         }
     };
@@ -26,8 +26,8 @@ var Accumulator = (function () {
     
     InnerAccumulator.prototype = {
         sum: function (numbersString) {
-            return this.stringConverter.convertToNumberArray(numbersString)
-            .reduce(function(previousValue, currentValue) {
+            return this.stringConverter.convertToNumberArray(numbersString).
+            reduce(function(previousValue, currentValue) {
                 return previousValue + currentValue;
             });
         }
