@@ -9,7 +9,7 @@ describe("StringCalculator", function () {
             this.stringCalculator = new StringCalculator();
         });
         
-        function returnPrintableArgument (argument) {
+        function printableArgument (argument) {
             return argument.split(",").
             map(function (stringNumber) { return stringNumber.trim(); }).
             concat();
@@ -23,8 +23,8 @@ describe("StringCalculator", function () {
             { argument: "1,\n2,3", expect: 6 }
         ].
         forEach(function (testObject) {
-            it("should return " + testObject.expect + " with " + returnPrintableArgument(testObject.argument) + " given", function () {
-                expect(this.stringCalculator.Add(testObject.argument)).to.eql(testObject.expect);
+            it("should return " + testObject.expect + " with " + printableArgument(testObject.argument) + " given", function () {
+                expect(this.stringCalculator.add(testObject.argument)).to.eql(testObject.expect);
             });
         });
         

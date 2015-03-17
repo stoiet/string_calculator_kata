@@ -2,17 +2,20 @@
 
 var StringConverter = (function () {
     
-    function InnerStringConverter (delimiter) {
-        this.delimiter = delimiter;
+    function InnerStringConverter (defaultDelimiter) {
+        this.delimiter = defaultDelimiter;
     }
     
     InnerStringConverter.prototype = {
-        convertToNumberArray: function (string) {
+        toNumberArray: function (string) {
+        	this._setDelimiter();
+
             return string.split(this.delimiter).
             map(function (stringNumber) {
                 return parseInt(stringNumber.trim());
             });
-        }
+        },
+        _setDelimiter: function () {}
     };
     
     return InnerStringConverter;
@@ -25,8 +28,8 @@ var Accumulator = (function () {
     }
     
     InnerAccumulator.prototype = {
-        sum: function (numbersString) {
-            return this.stringConverter.convertToNumberArray(numbersString).
+        sum: function (stringNumbers) {
+            return this.stringConverter.toNumberArray(stringNumbers).
             reduce(function(previousValue, currentValue) {
                 return previousValue + currentValue;
             });
@@ -43,9 +46,9 @@ var StringCalculator = (function () {
     }
     
     InnerStringCalculator.prototype = {
-        Add: function (numbersString) {
-            if (numbersString === "") return 0;
-            return this.accumulator.sum(numbersString);
+        add: function (stringNumbers) {
+            if (stringNumbers === "") return 0;
+            return this.accumulator.sum(stringNumbers);
         }
     }
     
