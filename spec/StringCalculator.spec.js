@@ -38,9 +38,19 @@ describe("StringCalculator", function () {
                 expect: 6
             },
             {
-                it: "should return the sum of numbers with string with different delimiter given",
+                it: "should return the sum of numbers with string with custom delimiter given",
                 argument: "//;\n1;2",
                 expect: 3
+            },
+            {
+                it: "should return the sum of numbers with string with any length of delimiter given",
+                argument: "//[***]\n1***2***3",
+                expect: 6
+            },
+            {
+                it: "should return the sum of numbers with string with any length of delimiter given",
+                argument: "//[||||]\n1||||2||||3",
+                expect: 6
             }
         ]
         .forEach(function (testCase) {
