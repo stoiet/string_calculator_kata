@@ -8,11 +8,31 @@ var StringConverter = (function () {
 
     InnerStringConverter.prototype = {
         toNumberArray: function (stringOfNumbers) {
-            return stringOfNumbers
-                .split(this.delimiter)
+            return this
+                ._toStringArray(stringOfNumbers.trim())
                 .map(function (stringNumber) {
                     return parseInt(stringNumber.trim());
                 });
+        },
+        _toStringArray: function (stringOfNumbers) {
+
+            this._stringOfNumbers = stringOfNumbers;
+            this._setDelimiterFromStringOfNumbers();
+
+            return this._stringOfNumbers.split(this.delimiter);
+        },
+        _setDelimiterFromStringOfNumbers: function () {
+
+            var customDelimiterPattern = /\/\/[.:,;|\n\t \"\']\n/;
+            var matchArray = this._stringOfNumbers.match(customDelimiterPattern);
+
+            if (matchArray) {
+                this.delimiter = this._getCustomDelimiter(matchArray);
+                this._stringOfNumbers = this._stringOfNumbers.slice(4);
+            }
+        },
+        _getCustomDelimiter: function (matchArray) {
+            return matchArray[0].substr(2, 1);
         }
     };
 

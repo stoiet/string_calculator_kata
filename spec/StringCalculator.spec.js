@@ -36,6 +36,11 @@ describe("StringCalculator", function () {
                 it: "should return the sum of numbers with string with new line characters given",
                 argument: "1,\n2,3",
                 expect: 6
+            },
+            {
+                it: "should return the sum of numbers with string with different delimiter given",
+                argument: "//;\n1;2",
+                expect: 3
             }
         ]
         .forEach(function (testCase) {
