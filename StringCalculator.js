@@ -7,32 +7,36 @@ var StringConverter = (function () {
     }
     
     InnerStringConverter.prototype = {
-        toNumberArray: function (string) {
-        	this._setDelimiter();
-
-            return string.split(this.delimiter).
-            map(function (stringNumber) {
-                return parseInt(stringNumber.trim());
-            });
-        },
-        _setDelimiter: function () {}
+        toNumberArray: function (stringOfNumbers) {
+            return stringOfNumbers
+                .split(this.delimiter)
+                .map(function (stringNumber) {
+                    return parseInt(stringNumber.trim());
+                });
+        }
     };
     
     return InnerStringConverter;
 })();
 
 var Accumulator = (function () {
+
+    var DefaultDelimiter = ",";
         
     function InnerAccumulator () {
-        this.stringConverter = new StringConverter(",");
+        this.stringConverter = new StringConverter(DefaultDelimiter);
     }
     
     InnerAccumulator.prototype = {
-        sum: function (stringNumbers) {
-            return this.stringConverter.toNumberArray(stringNumbers).
-            reduce(function(previousValue, currentValue) {
-                return previousValue + currentValue;
-            });
+        sum: function (stringOfNumbers) {
+            return this
+                ._toNumberArray(stringOfNumbers)
+                .reduce(function(previousValue, currentValue) {
+                    return previousValue + currentValue;
+                });
+        },
+        _toNumberArray: function (stringOfNumbers) {
+            return this.stringConverter.toNumberArray(stringOfNumbers);
         }
     };
     
@@ -46,9 +50,9 @@ var StringCalculator = (function () {
     }
     
     InnerStringCalculator.prototype = {
-        add: function (stringNumbers) {
-            if (stringNumbers === "") return 0;
-            return this.accumulator.sum(stringNumbers);
+        add: function (stringOfNumbers) {
+            if (stringOfNumbers === "") return 0;
+            return this.accumulator.sum(stringOfNumbers);
         }
     }
     

@@ -4,7 +4,7 @@
   "description": "",
   "main": "StringCalculator.js",
   "scripts": {
-    "test": "mocha spec/*"
+    "test": "mocha ---ui bdd --colors --reporter spec spec/*"
   },
   "repository": {
     "type": "git",
