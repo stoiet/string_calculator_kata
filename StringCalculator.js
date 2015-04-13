@@ -1,12 +1,40 @@
 "use strict";
 
-var StringConverter = (function () {
+var CustomDelimiter = (function () {
 
-    function InnerStringConverter (defaultDelimiter) {
-        this.delimiter = defaultDelimiter;
+    function _CustomDelimiter (defaultOptions) {
+        this.delimiter = defaultOptions.delimiter || ",";
+        this.customDelimiterPattern = defaultOptions.pattern || /\/\/[.:,;|\n\t \"\']\n/;
+        this.hasCustomDelimiter = false;
     }
 
-    InnerStringConverter.prototype = {
+    _CustomDelimiter.prototype = {
+        getDelimiter: function (stringOfNumbers) {
+            this._setCustomDelimiterFrom(stringOfNumbers);
+            return this.delimiter;
+        },
+        _setCustomDelimiterFrom: function (stringOfNumbers) {
+            var matchArray = stringOfNumbers.match(this.customDelimiterPattern);
+            if (matchArray) {
+                this.delimiter = this._getCustomDelimiterFrom(matchArray);
+                this.hasCustomDelimiter = true;
+            }
+        },
+        _getCustomDelimiterFrom: function (matchArray) {
+            return matchArray[0].substr(2, 1);
+        }
+    };
+
+    return _CustomDelimiter;
+})();
+
+var StringConverter = (function () {
+
+    function _StringConverter () {
+        this.customDelimiter = new CustomDelimiter({});
+    }
+
+    _StringConverter.prototype = {
         toNumberArray: function (stringOfNumbers) {
             return this
                 ._toStringArray(stringOfNumbers.trim())
@@ -15,39 +43,28 @@ var StringConverter = (function () {
                 });
         },
         _toStringArray: function (stringOfNumbers) {
-
-            this._stringOfNumbers = stringOfNumbers;
-            this._setDelimiterFromStringOfNumbers();
-
-            return this._stringOfNumbers.split(this.delimiter);
-        },
-        _setDelimiterFromStringOfNumbers: function () {
-
-            var customDelimiterPattern = /\/\/[.:,;|\n\t \"\']\n/;
-            var matchArray = this._stringOfNumbers.match(customDelimiterPattern);
-
-            if (matchArray) {
-                this.delimiter = this._getCustomDelimiter(matchArray);
-                this._stringOfNumbers = this._stringOfNumbers.slice(4);
+            var delimiter = this.customDelimiter.getDelimiter(stringOfNumbers);
+            if (this.customDelimiter.hasCustomDelimiter)
+            {
+                return stringOfNumbers.slice(4).split(delimiter);
             }
-        },
-        _getCustomDelimiter: function (matchArray) {
-            return matchArray[0].substr(2, 1);
+            else
+            {
+                return stringOfNumbers.split(delimiter);
+            }
         }
     };
 
-    return InnerStringConverter;
+    return _StringConverter;
 })();
 
-var Accumulator = (function () {
+var StringNumberAccumulator = (function () {
 
-    var DefaultDelimiter = ",";
-
-    function InnerAccumulator () {
-        this.stringConverter = new StringConverter(DefaultDelimiter);
+    function _StringNumberAccumulator () {
+        this.stringConverter = new StringConverter();
     }
 
-    InnerAccumulator.prototype = {
+    _StringNumberAccumulator.prototype = {
         sum: function (stringOfNumbers) {
             return this
                 ._toNumberArray(stringOfNumbers)
@@ -60,25 +77,25 @@ var Accumulator = (function () {
         }
     };
 
-    return InnerAccumulator;
+    return _StringNumberAccumulator;
 })();
 
 var StringCalculator = (function () {
 
-    function InnerStringCalculator () {
-        this.accumulator = new Accumulator();
+    function _StringCalculator () {
+        this.stringNumberAccumulator = new StringNumberAccumulator();
     }
 
-    InnerStringCalculator.prototype = {
+    _StringCalculator.prototype = {
         add: function (stringOfNumbers) {
             if (stringOfNumbers === "") {
                 return 0;
             }
-            return this.accumulator.sum(stringOfNumbers);
+            return this.stringNumberAccumulator.sum(stringOfNumbers);
         }
     };
 
-    return InnerStringCalculator;
+    return _StringCalculator;
 })();
 
 module.exports = StringCalculator;
