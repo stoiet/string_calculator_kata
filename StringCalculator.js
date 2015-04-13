@@ -1,13 +1,13 @@
 "use strict";
 
-var NegativeNumberExceptionHandler = (function () {
+var NegativeNumberException = (function () {
 
-    function _NegativeNumberError(numberArray) {
+    function _NegativeNumberException(numberArray) {
         this.numberArray = numberArray;
         this.exceptionString = "Negatives not allowed: ";
     }
 
-    _NegativeNumberError.prototype = {
+    _NegativeNumberException.prototype = {
         hasNegativeNumber: function() {
             var hasNegativeNumbers = false;
 
@@ -23,19 +23,19 @@ var NegativeNumberExceptionHandler = (function () {
 
             return hasNegativeNumbers;
         },
-        getExpcetionString: function() {
+        getString: function() {
             throw this.exceptionString;
         }
     };
 
-    return _NegativeNumberError;
+    return _NegativeNumberException;
 })();
 
 var CustomDelimiter = (function () {
 
-    function _CustomDelimiter (defaultOptions) {
-        this._delimiter = defaultOptions.delimiter || ",";
-        this._customDelimiterPattern = defaultOptions.pattern || /\/\/[.:,;|\n\t \"\']\n/;
+    function _CustomDelimiter (options) {
+        this._delimiter = options.delimiter || ",";
+        this._customDelimiterPattern = options.pattern || /\/\/[.:,;|\n\t \"\']\n/;
         this._hasCustomDelimiter = false;
     }
 
@@ -64,71 +64,111 @@ var CustomDelimiter = (function () {
 
 var StringConverter = (function () {
 
-    function _StringConverter () {
-        this.customDelimiter = new CustomDelimiter({});
-    }
+    function _StringConverter () {}
 
     _StringConverter.prototype = {
-        toNumberArray: function (stringOfNumbers) {
-            return this
-                ._toStringArray(stringOfNumbers.trim())
-                .map(function (stringNumber) {
-                    var number = parseInt(stringNumber.trim());
-                    return number;
-                });
+        toNumberArray: function (stringOfNumberArray) {
+            var _toNumber = this._toNumber;
+            return stringOfNumberArray.map(function (stringOfNumber) { return _toNumber(stringOfNumber); });
         },
-        _toStringArray: function (stringOfNumbers) {
-            var delimiter = this.customDelimiter.getDelimiter(stringOfNumbers);
-            var resultStringArray = null;
-
-            if (this.customDelimiter.hasCustomDelimiter()) {
-                resultStringArray = stringOfNumbers.slice(4).split(delimiter);
-            }
-            else {
-                resultStringArray = stringOfNumbers.split(delimiter);
-            }
-
-            return resultStringArray;
+        _toNumber: function(stringOfNumber) {
+            return parseInt(stringOfNumber.trim());
         }
     };
 
     return _StringConverter;
 })();
 
-var StringNumberAccumulator = (function () {
+var StringOfNumberArray = (function () {
 
-    function _StringNumberAccumulator () {
-        this.stringConverter = new StringConverter();
+    function _StringOfNumberArray () {
+        this._customDelimiter = new CustomDelimiter({});
     }
 
-    _StringNumberAccumulator.prototype = {
-        sum: function (stringOfNumbers) {
-            return this
-                ._toNumberArray(stringOfNumbers)
-                .reduce(function(previousValue, currentValue) {
-                    return previousValue + currentValue;
-                });
-        },
-        _toNumberArray: function (stringOfNumbers) {
-            var numberArray = this.stringConverter.toNumberArray(stringOfNumbers);
-            var negativeNumberExceptionHandler = new NegativeNumberExceptionHandler(numberArray);
+    _StringOfNumberArray.prototype = {
+        generateFrom: function (stringOfNumbers) {
+            var delimiter = this._customDelimiter.getDelimiter(stringOfNumbers);
+            var resultStringOfNumberArray = null;
 
-            if (negativeNumberExceptionHandler.hasNegativeNumber()) {
-                console.log(negativeNumberExceptionHandler.getExpcetionString());
-                throw new Error(NegativeNumberExceptionHandler.getExpcetionString());
+            if (this._customDelimiter.hasCustomDelimiter()) {
+                resultStringOfNumberArray = stringOfNumbers.slice(4).split(delimiter);
+            }
+            else {
+                resultStringOfNumberArray = stringOfNumbers.split(delimiter);
             }
 
-            return numberArray;
+            return resultStringOfNumberArray;
         }
     };
 
-    return _StringNumberAccumulator;
+    return _StringOfNumberArray;
+})();
+
+var NumberArray = (function () {
+
+    var defaultHighestValidNumber = 1000;
+
+    function _NumberArray (highestValidNumber) {
+        this._highestValidNumber = highestValidNumber || defaultHighestValidNumber;
+        this._stringOfNumberArray = new StringOfNumberArray();
+    }
+
+    _NumberArray.prototype = {
+        generateFrom: function (stringOfNumbers) {
+            var stringOfNumberArray = this._stringOfNumberArray.generateFrom(stringOfNumbers);
+            return this._getValidNumberArray(stringOfNumberArray);
+        },
+        _getValidNumberArray: function(stringOfNumberArray) {
+            var numberArray = this._toNumberArray(stringOfNumberArray);
+            this._throwExceptionIfHasNegativeNumber(numberArray);
+            return this._eliminateInvalidNumbers(numberArray);
+        },
+        _throwExceptionIfHasNegativeNumber: function (numberArray) {
+            var negativeNumberException = new NegativeNumberException(numberArray);
+            if (negativeNumberException.hasNegativeNumber()) {
+                throw new Error(negativeNumberException.getString());
+            }
+        },
+        _eliminateInvalidNumbers: function(numberArray) {
+            for (var i = 0; i < numberArray.length; ++i) {
+                if (numberArray[i] > this._highestValidNumber) {
+                    numberArray.splice(i, 1);
+                }
+            }
+            return numberArray;
+        },
+        _toNumberArray: function(stringOfNumberArray) {
+            var stringConverter = new StringConverter();
+            return stringConverter.toNumberArray(stringOfNumberArray);
+        }
+    };
+
+    return _NumberArray;
+})();
+
+var NumberArrayAccumulator = (function () {
+
+    function _NumberArrayAccumulator () {
+        this.numberArray = new NumberArray();
+    }
+
+    _NumberArrayAccumulator.prototype = {
+        sumFrom: function(stringOfNumbers) {
+            return this.numberArray
+                .generateFrom(stringOfNumbers)
+                .reduce(function(previousValue, currentValue) {
+                    return previousValue + currentValue;
+                });
+        }
+    };
+
+    return _NumberArrayAccumulator;
 })();
 
 var StringCalculator = (function () {
 
     function _StringCalculator () {
-        this.stringNumberAccumulator = new StringNumberAccumulator();
+        this.numberArrayAccumulator = new NumberArrayAccumulator();
     }
 
     _StringCalculator.prototype = {
@@ -136,7 +176,7 @@ var StringCalculator = (function () {
             if (stringOfNumbers === "") {
                 return 0;
             }
-            return this.stringNumberAccumulator.sum(stringOfNumbers);
+            return this.numberArrayAccumulator.sumFrom(stringOfNumbers);
         }
     };
 
