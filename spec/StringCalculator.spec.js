@@ -7,6 +7,12 @@ describe("StringCalculator", function () {
 
     describe("#Add", function () {
 
+        function testException(testCase) {
+            try {
+                expect(this.stringCalculator.add(testCase.argument)).to.throw(new Error(testCase.expect));
+            } catch (e) { return null; }
+        }
+
         beforeEach(function () {
             this.stringCalculator = new StringCalculator();
         });
@@ -46,6 +52,24 @@ describe("StringCalculator", function () {
         .forEach(function (testCase) {
             it(testCase.it, function () {
                 expect(this.stringCalculator.add(testCase.argument)).to.eql(testCase.expect);
+            });
+        });
+
+        [
+            {
+                it: "should throw an exception with negative number given",
+                argument: "-1,2",
+                expect: "Negatives not allowed: -1"
+            },
+            {
+                it: "should throw an exception with negative numbers given",
+                argument: "2,-4,3,-5",
+                expect: "Negatives not allowed: -4,-5"
+            }
+        ]
+        .forEach(function (testCase) {
+            it(testCase.it, function () {
+                testException(testCase);
             });
         });
 

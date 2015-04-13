@@ -1,23 +1,56 @@
 "use strict";
 
+var NegativeNumberExceptionHandler = (function () {
+
+    function _NegativeNumberError(numberArray) {
+        this.numberArray = numberArray;
+        this.exceptionString = "Negatives not allowed: ";
+    }
+
+    _NegativeNumberError.prototype = {
+        hasNegativeNumber: function() {
+            var hasNegativeNumbers = false;
+
+            for (var i = 0; i < this.numberArray.length; ++i) {
+                if (this.numberArray[i] < 0) {
+                    if (hasNegativeNumbers) {
+                        this.exceptionString += ",";
+                    }
+                    this.exceptionString += this.numberArray[i].toString();
+                }
+            }
+
+            return hasNegativeNumbers;
+        },
+        throw: function() {
+            throw new Error(this.exceptionString);
+        }
+    };
+
+    return _NegativeNumberError;
+})();
+
 var CustomDelimiter = (function () {
 
     function _CustomDelimiter (defaultOptions) {
-        this.delimiter = defaultOptions.delimiter || ",";
-        this.customDelimiterPattern = defaultOptions.pattern || /\/\/[.:,;|\n\t \"\']\n/;
-        this.hasCustomDelimiter = false;
+        this._delimiter = defaultOptions.delimiter || ",";
+        this._customDelimiterPattern = defaultOptions.pattern || /\/\/[.:,;|\n\t \"\']\n/;
+        this._hasCustomDelimiter = false;
     }
 
     _CustomDelimiter.prototype = {
         getDelimiter: function (stringOfNumbers) {
             this._setCustomDelimiterFrom(stringOfNumbers);
-            return this.delimiter;
+            return this._delimiter;
+        },
+        hasCustomDelimiter: function () {
+            return this._hasCustomDelimiter;
         },
         _setCustomDelimiterFrom: function (stringOfNumbers) {
-            var matchArray = stringOfNumbers.match(this.customDelimiterPattern);
+            var matchArray = stringOfNumbers.match(this._customDelimiterPattern);
             if (matchArray) {
-                this.delimiter = this._getCustomDelimiterFrom(matchArray);
-                this.hasCustomDelimiter = true;
+                this._delimiter = this._getCustomDelimiterFrom(matchArray);
+                this._hasCustomDelimiter = true;
             }
         },
         _getCustomDelimiterFrom: function (matchArray) {
@@ -39,15 +72,15 @@ var StringConverter = (function () {
             return this
                 ._toStringArray(stringOfNumbers.trim())
                 .map(function (stringNumber) {
-                    return parseInt(stringNumber.trim());
+                    var number = parseInt(stringNumber.trim());
+                    return number;
                 });
         },
         _toStringArray: function (stringOfNumbers) {
-
             var delimiter = this.customDelimiter.getDelimiter(stringOfNumbers);
             var resultStringArray = null;
 
-            if (this.customDelimiter.hasCustomDelimiter) {
+            if (this.customDelimiter.hasCustomDelimiter()) {
                 resultStringArray = stringOfNumbers.slice(4).split(delimiter);
             }
             else {
@@ -76,7 +109,14 @@ var StringNumberAccumulator = (function () {
                 });
         },
         _toNumberArray: function (stringOfNumbers) {
-            return this.stringConverter.toNumberArray(stringOfNumbers);
+            var numberArray = this.stringConverter.toNumberArray(stringOfNumbers);
+            var negativeNumberExceptionHandler = new NegativeNumberExceptionHandler(numberArray);
+
+            if (negativeNumberExceptionHandler.hasNegativeNumber()) {
+                negativeNumberExceptionHandler.throw();
+            }
+
+            return numberArray;
         }
     };
 
