@@ -43,15 +43,18 @@ var StringConverter = (function () {
                 });
         },
         _toStringArray: function (stringOfNumbers) {
+
             var delimiter = this.customDelimiter.getDelimiter(stringOfNumbers);
-            if (this.customDelimiter.hasCustomDelimiter)
-            {
-                return stringOfNumbers.slice(4).split(delimiter);
+            var resultStringArray = null;
+
+            if (this.customDelimiter.hasCustomDelimiter) {
+                resultStringArray = stringOfNumbers.slice(4).split(delimiter);
             }
-            else
-            {
-                return stringOfNumbers.split(delimiter);
+            else {
+                resultStringArray = stringOfNumbers.split(delimiter);
             }
+
+            return resultStringArray;
         }
     };
 
