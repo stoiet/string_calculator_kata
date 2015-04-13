@@ -1,10 +1,12 @@
+"use strict";
+
 var expect = require("chai").expect;
 var StringCalculator = require("../StringCalculator.js");
 
 describe("StringCalculator", function () {
-    
+
     describe("#Add", function () {
-        
+
         beforeEach(function () {
             this.stringCalculator = new StringCalculator();
         });
@@ -41,6 +43,6 @@ describe("StringCalculator", function () {
                 expect(this.stringCalculator.add(testCase.argument)).to.eql(testCase.expect);
             });
         });
-        
+
     });
 });

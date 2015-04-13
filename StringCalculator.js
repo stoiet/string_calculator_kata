@@ -1,11 +1,11 @@
 "use strict";
 
 var StringConverter = (function () {
-    
+
     function InnerStringConverter (defaultDelimiter) {
         this.delimiter = defaultDelimiter;
     }
-    
+
     InnerStringConverter.prototype = {
         toNumberArray: function (stringOfNumbers) {
             return stringOfNumbers
@@ -15,18 +15,18 @@ var StringConverter = (function () {
                 });
         }
     };
-    
+
     return InnerStringConverter;
 })();
 
 var Accumulator = (function () {
 
     var DefaultDelimiter = ",";
-        
+
     function InnerAccumulator () {
         this.stringConverter = new StringConverter(DefaultDelimiter);
     }
-    
+
     InnerAccumulator.prototype = {
         sum: function (stringOfNumbers) {
             return this
@@ -39,24 +39,26 @@ var Accumulator = (function () {
             return this.stringConverter.toNumberArray(stringOfNumbers);
         }
     };
-    
-    return InnerAccumulator;    
+
+    return InnerAccumulator;
 })();
 
 var StringCalculator = (function () {
-        
+
     function InnerStringCalculator () {
         this.accumulator = new Accumulator();
     }
-    
+
     InnerStringCalculator.prototype = {
         add: function (stringOfNumbers) {
-            if (stringOfNumbers === "") return 0;
+            if (stringOfNumbers === "") {
+                return 0;
+            }
             return this.accumulator.sum(stringOfNumbers);
         }
-    }
-    
-    return InnerStringCalculator;    
+    };
+
+    return InnerStringCalculator;
 })();
 
 module.exports = StringCalculator;

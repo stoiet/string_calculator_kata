@@ -18,6 +18,16 @@
   "homepage": "https://github.com/stoiet/string_calculator_kata",
   "devDependencies": {
     "chai": "^2.1.2",
+    "eslint": "^0.19.0",
     "mocha": "^2.2.1"
+  },
+  "eslintConfig": {
+      "env": {
+          "node": true
+      },
+      "rules": {
+        "no-underscore-dangle": false,
+        "no-undef": false
+      }
   }
 }
