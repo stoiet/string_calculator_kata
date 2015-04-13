@@ -15,6 +15,7 @@ var NegativeNumberExceptionHandler = (function () {
                 if (this.numberArray[i] < 0) {
                     if (hasNegativeNumbers) {
                         this.exceptionString += ",";
+                        hasNegativeNumbers = true;
                     }
                     this.exceptionString += this.numberArray[i].toString();
                 }
@@ -22,8 +23,8 @@ var NegativeNumberExceptionHandler = (function () {
 
             return hasNegativeNumbers;
         },
-        throw: function() {
-            throw new Error(this.exceptionString);
+        getExpcetionString: function() {
+            throw this.exceptionString;
         }
     };
 
@@ -113,7 +114,8 @@ var StringNumberAccumulator = (function () {
             var negativeNumberExceptionHandler = new NegativeNumberExceptionHandler(numberArray);
 
             if (negativeNumberExceptionHandler.hasNegativeNumber()) {
-                negativeNumberExceptionHandler.throw();
+                console.log(negativeNumberExceptionHandler.getExpcetionString());
+                throw new Error(NegativeNumberExceptionHandler.getExpcetionString());
             }
 
             return numberArray;
